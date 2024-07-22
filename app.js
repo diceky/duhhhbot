@@ -14,13 +14,16 @@ const PORT = process.env.PORT || 3000;
 // Parse request body and verifies incoming requests using discord-interactions package
 app.use(express.json({ verify: VerifyDiscordRequest(process.env.PUBLIC_KEY) }));
 
-// Store for in-progress games. In production, you'd want to use a DB
-const activeGames = {};
+// Store for in-progress conversation IDs
+const activeConvIds = {};
 
 /**
  * Interactions endpoint URL where Discord will send HTTP requests
  */
 app.post('/interactions', async function (req, res) {
+
+  console.log(`Active ConvIDs:${JSON.stringify(activeConvIds, null, 4)}`);
+
   // Interaction type and data
   const { type, id, data } = req.body;
 
@@ -39,6 +42,7 @@ app.post('/interactions', async function (req, res) {
     const { name } = data;
 
     if (name === 'duhhh') {
+      const userId = req.body.member.user.id;
       const question = req.body.data.options[0].value;
       const url = process.env.DIFY_ENDPOINT;
       const api_key = process.env.DIFY_KEY;
@@ -62,8 +66,8 @@ app.post('/interactions', async function (req, res) {
             inputs: {},
             query: question,
             response_mode: "blocking",
-            conversation_id: "",
-            user: id,
+            conversation_id: activeConvIds[userId] !== undefined ? activeConvIds[userId] : "",
+            user: userId,
           })
         })
           .then((res) => {
@@ -71,6 +75,7 @@ app.post('/interactions', async function (req, res) {
           })
           .then((data) => {
             response = data.answer;
+            activeConvIds[userId] = data.conversation_id;
           });
       } catch (error) {
         response = error;
