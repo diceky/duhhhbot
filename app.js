@@ -87,6 +87,18 @@ app.post('/interactions', async function (req, res) {
         }
       });
     };
+    
+    if (name === 'refresh') {
+      const userId = req.body.member.user.id;
+      activeConvIds[userId] = "";
+
+      return res.send({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: 'Conversation history is refreshed ✅',
+        },
+      });
+    }
   }
 });
 

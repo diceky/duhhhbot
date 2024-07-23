@@ -15,6 +15,12 @@ const DUHHH_COMMAND = {
   type: 1,
 };
 
-const ALL_COMMANDS = [DUHHH_COMMAND];
+const REFRESH_COMMAND = {
+  name: 'refresh',
+  description: 'Refresh conversation history and start from scratch',
+  type: 1,
+};
+
+const ALL_COMMANDS = [DUHHH_COMMAND, REFRESH_COMMAND];
 
 InstallGlobalCommands(process.env.APP_ID, ALL_COMMANDS);
